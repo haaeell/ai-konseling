@@ -94,7 +94,7 @@
         </main>
 
         @auth
-            <nav class="fixed inset-x-3 bottom-3 z-40 rounded-[24px] border border-stone-200 bg-[#fbfaf6]/95 p-2 shadow-2xl shadow-stone-900/10 backdrop-blur sm:hidden">
+            <nav id="mobile-bottom-nav" class="fixed inset-x-3 bottom-3 z-40 rounded-[24px] border border-stone-200 bg-[#fbfaf6]/95 p-2 shadow-2xl shadow-stone-900/10 backdrop-blur transition duration-200 sm:hidden">
                 <div class="grid grid-cols-3 gap-2 text-center text-xs font-bold">
                     @if(auth()->user()->isAdmin())
                         <a href="{{ route('admin.sessions.index') }}"

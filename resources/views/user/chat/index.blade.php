@@ -1,31 +1,31 @@
 <x-app-layout>
     <x-slot name="title">Ruang Konseling</x-slot>
 
-    <div class="grid gap-4 lg:gap-5 lg:grid-cols-[300px_1fr]">
-        <aside class="rounded-[28px] border border-stone-200 bg-[#fbfaf6]/90 p-4 shadow-sm">
+    <div class="grid gap-3 lg:gap-5 lg:grid-cols-[300px_1fr]">
+        <aside class="rounded-[28px] border border-stone-200 bg-[#fbfaf6]/90 p-3 shadow-sm sm:p-4">
             <div class="mb-4 flex items-center justify-between gap-3">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Ruang Sesi</p>
-                    <h2 class="mt-1 text-lg font-bold text-stone-900">Riwayat Percakapan</h2>
+                    <h2 class="mt-1 text-base font-bold text-stone-900 sm:text-lg">Riwayat Percakapan</h2>
                 </div>
 
                 <form method="POST" action="{{ route('chat.new') }}">
                     @csrf
-                    <button class="rounded-2xl bg-teal-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800">
+                    <button class="rounded-2xl bg-teal-700 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800 sm:px-4">
                         + Baru
                     </button>
                 </form>
             </div>
 
-            <div class="-mx-1 flex gap-3 overflow-x-auto px-1 pb-1 lg:mx-0 lg:block lg:max-h-[calc(100vh-230px)] lg:space-y-2 lg:overflow-y-auto lg:overflow-x-visible lg:px-0 lg:pb-0 lg:pr-1">
+            <div class="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 lg:mx-0 lg:block lg:max-h-[calc(100vh-230px)] lg:space-y-2 lg:overflow-y-auto lg:overflow-x-visible lg:px-0 lg:pb-0 lg:pr-1">
                 @foreach($sessions as $session)
                     <a href="{{ route('chat.show', $session) }}"
-                        class="block min-w-[230px] shrink-0 rounded-2xl border px-4 py-3 transition lg:min-w-0
+                        class="block min-w-[190px] shrink-0 rounded-2xl border px-3 py-3 transition lg:min-w-0 lg:px-4
                             {{ $currentSession->id === $session->id
                                 ? 'border-teal-200 bg-teal-50 text-teal-900'
                                 : 'border-transparent bg-white/70 text-stone-700 hover:border-stone-200 hover:bg-white' }}">
                         <div class="truncate text-sm font-bold">{{ $session->title }}</div>
-                        <div class="mt-1 text-xs text-stone-500">
+                        <div class="mt-1 truncate text-xs text-stone-500">
                             {{ $session->created_at->format('d M Y H:i') }}
                         </div>
                     </a>
@@ -33,8 +33,8 @@
             </div>
         </aside>
 
-        <section class="overflow-hidden rounded-[32px] border border-stone-200 bg-[#fbfaf6] shadow-sm">
-            <header class="border-b border-stone-200 bg-white/80 px-4 py-4 sm:px-5 sm:py-5">
+        <section id="mobile-chat-shell" class="flex min-h-0 flex-col overflow-hidden rounded-[32px] border border-stone-200 bg-[#fbfaf6] shadow-sm">
+            <header class="shrink-0 border-b border-stone-200 bg-white/90 px-4 py-4 sm:px-5 sm:py-5">
                 <div class="flex items-start justify-between gap-4">
                     <div class="min-w-0">
                         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Sesi Aktif</p>
@@ -48,7 +48,7 @@
                 </div>
             </header>
 
-            <div id="chat-messages" class="h-[52svh] space-y-4 overflow-y-auto bg-[linear-gradient(180deg,#fbfaf6,#f2efe7)] px-3 py-4 sm:h-[58vh] sm:space-y-5 sm:px-8 sm:py-6 lg:h-[62vh]">
+            <div id="chat-messages" class="min-h-[320px] flex-1 space-y-4 overflow-y-auto bg-[linear-gradient(180deg,#fbfaf6,#f2efe7)] px-3 py-4 sm:min-h-0 sm:space-y-5 sm:px-8 sm:py-6">
                 @forelse($currentSession->messages as $message)
                     <div class="flex {{ $message->sender === 'user' ? 'justify-end' : 'justify-start' }}" data-message-id="{{ $message->id }}">
                         <div class="max-w-[92%] rounded-[24px] px-4 py-3 text-sm leading-relaxed shadow-sm sm:max-w-[72%] sm:px-5 sm:py-4
@@ -72,7 +72,7 @@
                 @endforelse
             </div>
 
-            <form id="chat-form" method="POST" action="{{ route('chat.store', $currentSession) }}" class="border-t border-stone-200 bg-white/90 px-3 py-3 pb-24 backdrop-blur sm:px-6 sm:py-4 sm:pb-4">
+            <form id="chat-form" method="POST" action="{{ route('chat.store', $currentSession) }}" class="shrink-0 border-t border-stone-200 bg-white/95 px-3 py-3 pb-24 backdrop-blur transition-[padding,transform] sm:px-6 sm:py-4 sm:pb-4">
                 @csrf
 
                 <div class="rounded-[28px] border border-stone-200 bg-[#fbfaf6] p-2 shadow-sm">
@@ -95,8 +95,43 @@
         </section>
     </div>
 
+    <style>
+        body.chat-keyboard-open #mobile-bottom-nav,
+        body.chat-input-focused #mobile-bottom-nav {
+            transform: translateY(120%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @media (max-width: 639px) {
+            body.chat-page main {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+
+            #mobile-chat-shell {
+                min-height: calc(100svh - 14.5rem);
+            }
+
+            body.chat-keyboard-open #chat-form {
+                padding-bottom: 0.75rem;
+            }
+
+            body.chat-input-focused #chat-form {
+                padding-bottom: 0.75rem;
+            }
+
+            body.chat-input-focused #mobile-chat-shell,
+            body.chat-keyboard-open #mobile-chat-shell {
+                min-height: calc(100svh - 10rem);
+            }
+        }
+    </style>
+
     <script>
         (() => {
+            document.body.classList.add('chat-page');
+
             const form = document.getElementById('chat-form');
             const input = document.getElementById('message-input');
             const messages = document.getElementById('chat-messages');
@@ -104,14 +139,43 @@
             const status = document.getElementById('chat-status');
             const title = document.getElementById('chat-title');
             const token = form.querySelector('input[name="_token"]').value;
+            const mobileBottomNav = document.getElementById('mobile-bottom-nav');
 
             const scrollToBottom = () => {
                 messages.scrollTop = messages.scrollHeight;
             };
 
+            const syncMobileViewport = () => {
+                if (window.innerWidth >= 640) {
+                    document.body.classList.remove('chat-keyboard-open');
+                    document.body.classList.remove('chat-input-focused');
+                    messages.style.height = '';
+                    return;
+                }
+
+                const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+                const keyboardOpen = window.visualViewport
+                    ? window.innerHeight - window.visualViewport.height > 140
+                    : false;
+
+                document.body.classList.toggle('chat-keyboard-open', keyboardOpen);
+
+                const headerHeight = messages.previousElementSibling?.offsetHeight ?? 0;
+                const formHeight = form.offsetHeight ?? 0;
+                const navOffset = keyboardOpen || !mobileBottomNav ? 16 : (mobileBottomNav.offsetHeight + 28);
+                const availableHeight = Math.max(260, viewportHeight - headerHeight - formHeight - navOffset - 24);
+
+                messages.style.height = `${availableHeight}px`;
+
+                if (keyboardOpen) {
+                    requestAnimationFrame(scrollToBottom);
+                }
+            };
+
             const resizeInput = () => {
                 input.style.height = 'auto';
                 input.style.height = `${Math.min(input.scrollHeight, 144)}px`;
+                syncMobileViewport();
             };
 
             const escapeHtml = (value) => value
@@ -176,8 +240,24 @@
             };
 
             input.addEventListener('input', resizeInput);
+            input.addEventListener('focus', () => {
+                document.body.classList.add('chat-input-focused');
+                syncMobileViewport();
+            });
+            input.addEventListener('blur', () => {
+                document.body.classList.remove('chat-input-focused');
+                setTimeout(syncMobileViewport, 120);
+            });
             scrollToBottom();
             resizeInput();
+            syncMobileViewport();
+
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', syncMobileViewport);
+                window.visualViewport.addEventListener('scroll', syncMobileViewport);
+            }
+
+            window.addEventListener('resize', syncMobileViewport);
 
             input.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter' && !event.shiftKey) {
@@ -253,6 +333,7 @@
                 } finally {
                     sendButton.disabled = false;
                     status.textContent = 'Ceritakan pelan-pelan. Kamu tidak harus merapikan semuanya sekaligus.';
+                    syncMobileViewport();
                 }
             });
         })();
