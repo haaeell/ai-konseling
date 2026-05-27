@@ -10,6 +10,7 @@ use App\Services\OpenRouterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class ChatController extends Controller
@@ -193,6 +194,14 @@ class ChatController extends Controller
         if ($session->user_id === auth()->id()) {
             return null;
         }
+
+        Log::warning('Chat session ownership mismatch', [
+            'session_id' => $session->id,
+            'session_user_id' => $session->user_id,
+            'auth_user_id' => auth()->id(),
+            'request_path' => $request->path(),
+            'ip' => $request->ip(),
+        ]);
 
         if ($request->expectsJson()) {
             return response()->json([
