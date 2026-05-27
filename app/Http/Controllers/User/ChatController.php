@@ -10,7 +10,7 @@ use App\Services\OpenRouterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class ChatController extends Controller
 {
