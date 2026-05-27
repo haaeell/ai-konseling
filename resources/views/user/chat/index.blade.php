@@ -223,11 +223,25 @@
                         body: JSON.stringify({ message }),
                     });
 
-                    const data = await response.json();
+                    const contentType = response.headers.get('content-type') ?? '';
+                    const data = contentType.includes('application/json')
+                        ? await response.json()
+                        : null;
+
                     typingBubble.remove();
 
-                    if (!response.ok || !data.ok) {
-                        showError(data.error ?? 'AI belum bisa membalas saat ini. Silakan coba lagi.');
+                    if (!response.ok || !data?.ok) {
+                        if (response.status === 401) {
+                            showError('Sesi login kamu sudah berakhir. Muat ulang halaman lalu login kembali.');
+                            return;
+                        }
+
+                        if (response.status === 403) {
+                            showError(data?.error ?? 'Sesi chat ini tidak bisa diakses. Muat ulang halaman lalu coba lagi.');
+                            return;
+                        }
+
+                        showError(data?.error ?? 'AI belum bisa membalas saat ini. Silakan coba lagi.');
                         return;
                     }
 

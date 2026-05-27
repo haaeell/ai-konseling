@@ -7,7 +7,10 @@ use App\Models\CounselingMessage;
 use App\Models\CounselingSession;
 use App\Models\SiteSetting;
 use App\Services\OpenRouterService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ChatController extends Controller
 {
@@ -33,7 +36,11 @@ class ChatController extends Controller
 
     public function show(CounselingSession $session)
     {
-        abort_if($session->user_id !== auth()->id(), 403);
+        $ownershipCheck = $this->ensureOwnedSession($session, request());
+
+        if ($ownershipCheck instanceof JsonResponse || $ownershipCheck instanceof RedirectResponse || $ownershipCheck instanceof Response) {
+            return $ownershipCheck;
+        }
 
         $sessions = CounselingSession::where('user_id', auth()->id())
             ->latest()
@@ -46,7 +53,11 @@ class ChatController extends Controller
 
     public function store(Request $request, CounselingSession $session, OpenRouterService $ai)
     {
-        abort_if($session->user_id !== auth()->id(), 403);
+        $ownershipCheck = $this->ensureOwnedSession($session, $request);
+
+        if ($ownershipCheck instanceof JsonResponse || $ownershipCheck instanceof RedirectResponse || $ownershipCheck instanceof Response) {
+            return $ownershipCheck;
+        }
 
         $validated = $request->validate([
             'message' => ['required', 'string', 'min:2', 'max:2000'],
@@ -175,5 +186,21 @@ class ChatController extends Controller
             'message' => $message->message,
             'time' => $message->created_at->format('H:i'),
         ];
+    }
+
+    private function ensureOwnedSession(CounselingSession $session, Request $request): Response|null
+    {
+        if ($session->user_id === auth()->id()) {
+            return null;
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => false,
+                'error' => 'Sesi chat ini tidak bisa diakses. Silakan muat ulang halaman dan coba lagi.',
+            ], 403);
+        }
+
+        abort(403, 'Sesi chat ini tidak bisa diakses.');
     }
 }
