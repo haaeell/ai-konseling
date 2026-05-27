@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="title">Ruang Konseling</x-slot>
 
-    <div class="grid gap-5 lg:grid-cols-[300px_1fr]">
+    <div class="grid gap-4 lg:gap-5 lg:grid-cols-[300px_1fr]">
         <aside class="rounded-[28px] border border-stone-200 bg-[#fbfaf6]/90 p-4 shadow-sm">
             <div class="mb-4 flex items-center justify-between gap-3">
                 <div>
@@ -12,15 +12,15 @@
                 <form method="POST" action="{{ route('chat.new') }}">
                     @csrf
                     <button class="rounded-2xl bg-teal-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800">
-                        Baru
+                        + Baru
                     </button>
                 </form>
             </div>
 
-            <div class="max-h-[26vh] space-y-2 overflow-y-auto pr-1 lg:max-h-[calc(100vh-230px)]">
+            <div class="-mx-1 flex gap-3 overflow-x-auto px-1 pb-1 lg:mx-0 lg:block lg:max-h-[calc(100vh-230px)] lg:space-y-2 lg:overflow-y-auto lg:overflow-x-visible lg:px-0 lg:pb-0 lg:pr-1">
                 @foreach($sessions as $session)
                     <a href="{{ route('chat.show', $session) }}"
-                        class="block rounded-2xl border px-4 py-3 transition
+                        class="block min-w-[230px] shrink-0 rounded-2xl border px-4 py-3 transition lg:min-w-0
                             {{ $currentSession->id === $session->id
                                 ? 'border-teal-200 bg-teal-50 text-teal-900'
                                 : 'border-transparent bg-white/70 text-stone-700 hover:border-stone-200 hover:bg-white' }}">
@@ -34,12 +34,12 @@
         </aside>
 
         <section class="overflow-hidden rounded-[32px] border border-stone-200 bg-[#fbfaf6] shadow-sm">
-            <header class="border-b border-stone-200 bg-white/70 px-5 py-5">
+            <header class="border-b border-stone-200 bg-white/80 px-4 py-4 sm:px-5 sm:py-5">
                 <div class="flex items-start justify-between gap-4">
                     <div class="min-w-0">
                         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Sesi Aktif</p>
-                        <h1 id="chat-title" class="mt-1 truncate text-2xl font-bold text-stone-950">{{ $currentSession->title }}</h1>
-                        <p id="chat-status" class="mt-1 text-sm text-stone-500">Ceritakan pelan-pelan. Kamu tidak harus merapikan semuanya sekaligus.</p>
+                        <h1 id="chat-title" class="mt-1 text-xl font-bold leading-tight text-stone-950 sm:truncate sm:text-2xl">{{ $currentSession->title }}</h1>
+                        <p id="chat-status" class="mt-1 text-sm leading-relaxed text-stone-500">Ceritakan pelan-pelan. Kamu tidak harus merapikan semuanya sekaligus.</p>
                     </div>
                     <div class="hidden rounded-2xl border border-teal-100 bg-teal-50 px-4 py-3 text-right sm:block">
                         <p class="text-xs text-teal-700">Mode</p>
@@ -48,10 +48,10 @@
                 </div>
             </header>
 
-            <div id="chat-messages" class="h-[58vh] space-y-5 overflow-y-auto bg-[linear-gradient(180deg,#fbfaf6,#f2efe7)] px-4 py-6 sm:px-8 lg:h-[62vh]">
+            <div id="chat-messages" class="h-[52svh] space-y-4 overflow-y-auto bg-[linear-gradient(180deg,#fbfaf6,#f2efe7)] px-3 py-4 sm:h-[58vh] sm:space-y-5 sm:px-8 sm:py-6 lg:h-[62vh]">
                 @forelse($currentSession->messages as $message)
                     <div class="flex {{ $message->sender === 'user' ? 'justify-end' : 'justify-start' }}" data-message-id="{{ $message->id }}">
-                        <div class="max-w-[90%] rounded-[24px] px-5 py-4 text-sm leading-relaxed shadow-sm sm:max-w-[72%]
+                        <div class="max-w-[92%] rounded-[24px] px-4 py-3 text-sm leading-relaxed shadow-sm sm:max-w-[72%] sm:px-5 sm:py-4
                             {{ $message->sender === 'user'
                                 ? 'rounded-tr-md bg-teal-700 text-white'
                                 : 'rounded-tl-md border border-stone-200 bg-white text-stone-800' }}">
@@ -65,23 +65,23 @@
                         </div>
                     </div>
                 @empty
-                    <div id="empty-chat" class="mx-auto mt-14 max-w-lg rounded-[28px] border border-stone-200 bg-white px-6 py-5 text-center shadow-sm">
+                    <div id="empty-chat" class="mx-auto mt-10 max-w-lg rounded-[28px] border border-stone-200 bg-white px-5 py-5 text-center shadow-sm sm:mt-14 sm:px-6">
                         <p class="text-base font-bold text-stone-900">Mulai dari hal yang paling terasa hari ini.</p>
                         <p class="mt-2 text-sm leading-relaxed text-stone-500">Tidak perlu langsung lengkap. Satu kalimat pendek juga cukup untuk memulai.</p>
                     </div>
                 @endforelse
             </div>
 
-            <form id="chat-form" method="POST" action="{{ route('chat.store', $currentSession) }}" class="border-t border-stone-200 bg-white/80 px-4 py-4 sm:px-6">
+            <form id="chat-form" method="POST" action="{{ route('chat.store', $currentSession) }}" class="border-t border-stone-200 bg-white/90 px-3 py-3 pb-24 backdrop-blur sm:px-6 sm:py-4 sm:pb-4">
                 @csrf
 
                 <div class="rounded-[28px] border border-stone-200 bg-[#fbfaf6] p-2 shadow-sm">
-                    <div class="flex items-end gap-3">
+                    <div class="flex items-end gap-2 sm:gap-3">
                         <textarea id="message-input" name="message" rows="1" required maxlength="2000" placeholder="Tulis apa yang sedang kamu rasakan..."
-                            class="max-h-36 min-h-[52px] flex-1 resize-none border-0 bg-transparent px-3 py-3 text-sm text-stone-800 placeholder:text-stone-400 focus:ring-0"></textarea>
+                            class="max-h-36 min-h-[48px] flex-1 resize-none border-0 bg-transparent px-3 py-3 text-sm text-stone-800 placeholder:text-stone-400 focus:ring-0 sm:min-h-[52px]"></textarea>
 
                         <button id="send-button"
-                            class="mb-1 rounded-2xl bg-teal-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:bg-stone-300"
+                            class="mb-1 shrink-0 rounded-2xl bg-teal-700 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:bg-stone-300 sm:px-5"
                             aria-label="Kirim pesan">
                             Kirim
                         </button>
