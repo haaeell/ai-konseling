@@ -191,7 +191,7 @@ class ChatController extends Controller
 
     private function ensureOwnedSession(CounselingSession $session, Request $request): Response|null
     {
-        if ($session->user_id === auth()->id()) {
+        if ((int) $session->user_id === (int) auth()->id()) {
             return null;
         }
 
