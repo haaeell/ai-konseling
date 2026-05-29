@@ -4,33 +4,27 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-use Throwable;
 
-class OpenRouterService
+class OpenAIService
 {
     public function ask(array $messages): array
     {
         try {
-            $model = (string) config('openrouter.model');
-            $apiKey = (string) config('openrouter.api_key');
+            $model = (string) config('openai.model');
+            $apiKey = (string) config('openai.api_key');
 
             if ($apiKey === '') {
                 return [
                     'ok' => false,
                     'message' => null,
-                    'error' => 'Konfigurasi AI belum lengkap. OPENROUTER_API_KEY belum diatur.',
+                    'error' => 'Konfigurasi AI belum lengkap. OPENAI_API_KEY belum diatur.',
                 ];
             }
 
             $response = Http::timeout(40)
-                ->withHeaders([
-                    'Authorization' => 'Bearer ' . $apiKey,
-                    'HTTP-Referer' => config('openrouter.site_url'),
-                    'X-Title' => config('openrouter.app_name'),
-                    'Content-Type' => 'application/json',
-                ])
-                ->post('https://openrouter.ai/api/v1/chat/completions', [
+                ->withToken($apiKey)
+                ->acceptJson()
+                ->post('https://api.openai.com/v1/chat/completions', [
                     'model' => $model,
                     'messages' => $messages,
                     'temperature' => 0.7,
@@ -40,7 +34,7 @@ class OpenRouterService
             if (! $response->successful()) {
                 $errorMessage = (string) $response->json('error.message', '');
 
-                Log::error('OpenRouter error', [
+                Log::error('OpenAI error', [
                     'status' => $response->status(),
                     'model' => $model,
                     'error_message' => $errorMessage,
@@ -57,7 +51,7 @@ class OpenRouterService
             $content = $response->json('choices.0.message.content');
 
             if (! is_string($content) || trim($content) === '') {
-                Log::warning('OpenRouter returned empty content', [
+                Log::warning('OpenAI returned empty content', [
                     'model' => $model,
                     'body' => $response->body(),
                 ]);
@@ -71,11 +65,11 @@ class OpenRouterService
 
             return [
                 'ok' => true,
-                'message' => $content,
+                'message' => trim($content),
                 'error' => null,
             ];
-        } catch (Throwable $e) {
-            Log::error('OpenRouter exception', [
+        } catch (\Throwable $e) {
+            Log::error('OpenAI exception', [
                 'message' => $e->getMessage(),
             ]);
 
@@ -90,19 +84,15 @@ class OpenRouterService
     private function mapHttpError(int $status, string $errorMessage, string $model): string
     {
         if ($status === 401 || $status === 403) {
-            return 'Autentikasi ke layanan AI gagal. Periksa kembali API key OpenRouter.';
-        }
-
-        if ($status === 404 && Str::contains(strtolower($errorMessage), 'no endpoints found')) {
-            return "Model AI yang dipakai saat ini tidak tersedia: {$model}. Silakan ganti model OpenRouter di konfigurasi.";
+            return 'Autentikasi ke layanan AI gagal. Periksa kembali API key OpenAI.';
         }
 
         if ($status === 404) {
-            return 'Endpoint layanan AI tidak ditemukan. Periksa konfigurasi OpenRouter yang digunakan.';
+            return "Model AI yang dipakai saat ini tidak tersedia: {$model}. Silakan periksa OPENAI_MODEL.";
         }
 
         if (in_array($status, [402, 429], true)) {
-            return 'Batas penggunaan AI sedang tercapai atau kredit OpenRouter habis. Silakan coba lagi nanti.';
+            return 'Batas penggunaan AI sedang tercapai atau kredit OpenAI habis. Silakan coba lagi nanti.';
         }
 
         if ($status >= 500) {

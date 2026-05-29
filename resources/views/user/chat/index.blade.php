@@ -1,9 +1,9 @@
 <x-app-layout>
     <x-slot name="title">Ruang Konseling</x-slot>
 
-    <div class="grid gap-3 lg:gap-5 lg:grid-cols-[300px_1fr]">
-        <aside class="rounded-[28px] border border-stone-200 bg-[#fbfaf6]/90 p-3 shadow-sm sm:p-4">
-            <div class="mb-4 flex items-center justify-between gap-3">
+    <div id="chat-layout" class="grid gap-3 lg:gap-5 lg:grid-cols-[300px_1fr]">
+        <aside class="rounded-[24px] border border-stone-200 bg-[#fbfaf6]/90 p-3 shadow-sm sm:rounded-[28px] sm:p-4">
+            <div class="mb-3 flex items-center justify-between gap-3 sm:mb-4">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Ruang Sesi</p>
                     <h2 class="mt-1 text-base font-bold text-stone-900 sm:text-lg">Riwayat Percakapan</h2>
@@ -33,13 +33,13 @@
             </div>
         </aside>
 
-        <section id="mobile-chat-shell" class="flex min-h-0 flex-col overflow-hidden rounded-[32px] border border-stone-200 bg-[#fbfaf6] shadow-sm">
-            <header class="shrink-0 border-b border-stone-200 bg-white/90 px-4 py-4 sm:px-5 sm:py-5">
+        <section id="mobile-chat-shell" class="flex min-h-0 flex-col overflow-hidden rounded-[24px] border border-stone-200 bg-[#fbfaf6] shadow-sm sm:rounded-[32px]">
+            <header class="shrink-0 border-b border-stone-200 bg-white/90 px-4 py-3 sm:px-5 sm:py-5">
                 <div class="flex items-start justify-between gap-4">
                     <div class="min-w-0">
                         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Sesi Aktif</p>
-                        <h1 id="chat-title" class="mt-1 text-xl font-bold leading-tight text-stone-950 sm:truncate sm:text-2xl">{{ $currentSession->title }}</h1>
-                        <p id="chat-status" class="mt-1 text-sm leading-relaxed text-stone-500">Ceritakan pelan-pelan. Kamu tidak harus merapikan semuanya sekaligus.</p>
+                        <h1 id="chat-title" class="mt-1 line-clamp-1 text-lg font-bold leading-tight text-stone-950 sm:truncate sm:text-2xl">{{ $currentSession->title }}</h1>
+                        <p id="chat-status" class="mt-1 line-clamp-2 text-xs leading-relaxed text-stone-500 sm:text-sm">Ceritakan pelan-pelan. Kamu tidak harus merapikan semuanya sekaligus.</p>
                     </div>
                     <div class="hidden rounded-2xl border border-teal-100 bg-teal-50 px-4 py-3 text-right sm:block">
                         <p class="text-xs text-teal-700">Mode</p>
@@ -48,10 +48,10 @@
                 </div>
             </header>
 
-            <div id="chat-messages" class="min-h-[320px] flex-1 space-y-4 overflow-y-auto bg-[linear-gradient(180deg,#fbfaf6,#f2efe7)] px-3 py-4 sm:min-h-0 sm:space-y-5 sm:px-8 sm:py-6">
+            <div id="chat-messages" class="min-h-0 flex-1 space-y-3 overflow-y-auto bg-[linear-gradient(180deg,#fbfaf6,#f2efe7)] px-3 py-4 sm:space-y-5 sm:px-8 sm:py-6">
                 @forelse($currentSession->messages as $message)
                     <div class="flex {{ $message->sender === 'user' ? 'justify-end' : 'justify-start' }}" data-message-id="{{ $message->id }}">
-                        <div class="max-w-[92%] rounded-[24px] px-4 py-3 text-sm leading-relaxed shadow-sm sm:max-w-[72%] sm:px-5 sm:py-4
+                        <div class="max-w-[88%] rounded-[22px] px-4 py-3 text-sm leading-relaxed shadow-sm sm:max-w-[72%] sm:rounded-[24px] sm:px-5 sm:py-4
                             {{ $message->sender === 'user'
                                 ? 'rounded-tr-md bg-teal-700 text-white'
                                 : 'rounded-tl-md border border-stone-200 bg-white text-stone-800' }}">
@@ -72,13 +72,13 @@
                 @endforelse
             </div>
 
-            <form id="chat-form" method="POST" action="{{ route('chat.store', $currentSession) }}" class="shrink-0 border-t border-stone-200 bg-white/95 px-3 py-3 pb-24 backdrop-blur transition-[padding,transform] sm:px-6 sm:py-4 sm:pb-4">
+            <form id="chat-form" method="POST" action="{{ route('chat.store', $currentSession) }}" class="shrink-0 border-t border-stone-200 bg-white/95 px-3 py-3 pb-3 backdrop-blur transition-[padding,transform] sm:px-6 sm:py-4 sm:pb-4">
                 @csrf
 
-                <div class="rounded-[28px] border border-stone-200 bg-[#fbfaf6] p-2 shadow-sm">
+                <div class="rounded-[22px] border border-stone-200 bg-[#fbfaf6] p-1.5 shadow-sm sm:rounded-[28px] sm:p-2">
                     <div class="flex items-end gap-2 sm:gap-3">
                         <textarea id="message-input" name="message" rows="1" required maxlength="2000" placeholder="Tulis apa yang sedang kamu rasakan..."
-                            class="max-h-36 min-h-[48px] flex-1 resize-none border-0 bg-transparent px-3 py-3 text-sm text-stone-800 placeholder:text-stone-400 focus:ring-0 sm:min-h-[52px]"></textarea>
+                            class="max-h-32 min-h-[44px] flex-1 resize-none border-0 bg-transparent px-3 py-3 text-sm text-stone-800 placeholder:text-stone-400 focus:ring-0 sm:max-h-36 sm:min-h-[52px]"></textarea>
 
                         <button id="send-button"
                             class="mb-1 shrink-0 rounded-2xl bg-teal-700 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:bg-stone-300 sm:px-5"
@@ -88,7 +88,7 @@
                     </div>
                 </div>
 
-                <p class="mt-3 px-2 text-xs leading-relaxed text-stone-500">
+                <p class="mt-2 px-2 text-[11px] leading-relaxed text-stone-500 sm:mt-3 sm:text-xs">
                     Jika kamu merasa dalam bahaya atau ingin menyakiti diri, segera hubungi orang terpercaya atau layanan darurat terdekat.
                 </p>
             </form>
@@ -96,6 +96,7 @@
     </div>
 
     <style>
+        body.chat-page #mobile-bottom-nav,
         body.chat-keyboard-open #mobile-bottom-nav,
         body.chat-input-focused #mobile-bottom-nav {
             transform: translateY(120%);
@@ -105,25 +106,36 @@
 
         @media (max-width: 639px) {
             body.chat-page main {
-                padding-top: 1rem;
-                padding-bottom: 1rem;
+                height: calc(100svh - 5.75rem);
+                overflow: hidden;
+                padding: 0.75rem;
+            }
+
+            #chat-layout {
+                display: flex;
+                height: 100%;
+                min-height: 0;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            #chat-layout aside {
+                flex: 0 0 auto;
             }
 
             #mobile-chat-shell {
-                min-height: calc(100svh - 14.5rem);
+                flex: 1 1 auto;
+                min-height: 0;
             }
 
-            body.chat-keyboard-open #chat-form {
-                padding-bottom: 0.75rem;
+            body.chat-keyboard-open main {
+                height: 100svh;
+                padding-bottom: 0.5rem;
+                padding-top: 0.5rem;
             }
 
-            body.chat-input-focused #chat-form {
-                padding-bottom: 0.75rem;
-            }
-
-            body.chat-input-focused #mobile-chat-shell,
-            body.chat-keyboard-open #mobile-chat-shell {
-                min-height: calc(100svh - 10rem);
+            body.chat-keyboard-open #chat-layout aside {
+                display: none;
             }
         }
     </style>
@@ -138,8 +150,8 @@
             const sendButton = document.getElementById('send-button');
             const status = document.getElementById('chat-status');
             const title = document.getElementById('chat-title');
+            const shell = document.getElementById('mobile-chat-shell');
             const token = form.querySelector('input[name="_token"]').value;
-            const mobileBottomNav = document.getElementById('mobile-bottom-nav');
 
             const scrollToBottom = () => {
                 messages.scrollTop = messages.scrollHeight;
@@ -149,7 +161,7 @@
                 if (window.innerWidth >= 640) {
                     document.body.classList.remove('chat-keyboard-open');
                     document.body.classList.remove('chat-input-focused');
-                    messages.style.height = '';
+                    shell.style.height = '';
                     return;
                 }
 
@@ -160,12 +172,9 @@
 
                 document.body.classList.toggle('chat-keyboard-open', keyboardOpen);
 
-                const headerHeight = messages.previousElementSibling?.offsetHeight ?? 0;
-                const formHeight = form.offsetHeight ?? 0;
-                const navOffset = keyboardOpen || !mobileBottomNav ? 16 : (mobileBottomNav.offsetHeight + 28);
-                const availableHeight = Math.max(260, viewportHeight - headerHeight - formHeight - navOffset - 24);
-
-                messages.style.height = `${availableHeight}px`;
+                const shellTop = shell.getBoundingClientRect().top;
+                const availableHeight = Math.max(340, viewportHeight - shellTop - 8);
+                shell.style.height = `${availableHeight}px`;
 
                 if (keyboardOpen) {
                     requestAnimationFrame(scrollToBottom);
@@ -198,8 +207,8 @@
 
                 const bubble = document.createElement('div');
                 bubble.className = sender === 'user'
-                    ? 'max-w-[90%] rounded-[24px] rounded-tr-md bg-teal-700 px-5 py-4 text-sm leading-relaxed text-white shadow-sm sm:max-w-[72%]'
-                    : 'max-w-[90%] rounded-[24px] rounded-tl-md border border-stone-200 bg-white px-5 py-4 text-sm leading-relaxed text-stone-800 shadow-sm sm:max-w-[72%]';
+                    ? 'max-w-[88%] rounded-[22px] rounded-tr-md bg-teal-700 px-4 py-3 text-sm leading-relaxed text-white shadow-sm sm:max-w-[72%] sm:rounded-[24px] sm:px-5 sm:py-4'
+                    : 'max-w-[88%] rounded-[22px] rounded-tl-md border border-stone-200 bg-white px-4 py-3 text-sm leading-relaxed text-stone-800 shadow-sm sm:max-w-[72%] sm:rounded-[24px] sm:px-5 sm:py-4';
 
                 const label = document.createElement('div');
                 label.className = sender === 'user' ? 'mb-2 text-xs font-semibold text-teal-100' : 'mb-2 text-xs font-semibold text-teal-700';

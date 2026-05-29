@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CounselingMessage;
 use App\Models\CounselingSession;
 use App\Models\SiteSetting;
-use App\Services\OpenRouterService;
+use App\Services\OpenAIService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -52,7 +52,7 @@ class ChatController extends Controller
         return view('user.chat.index', compact('sessions', 'currentSession'));
     }
 
-    public function store(Request $request, CounselingSession $session, OpenRouterService $ai)
+    public function store(Request $request, CounselingSession $session, OpenAIService $ai)
     {
         $ownershipCheck = $this->ensureOwnedSession($session, $request);
 
