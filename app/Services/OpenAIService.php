@@ -21,6 +21,14 @@ class OpenAIService
                 ];
             }
 
+            if (str_starts_with($apiKey, 'sk-or-')) {
+                return [
+                    'ok' => false,
+                    'message' => null,
+                    'error' => 'OPENAI_API_KEY masih berisi API key OpenRouter. Ganti dengan API key dari platform OpenAI.',
+                ];
+            }
+
             $response = Http::timeout(40)
                 ->withToken($apiKey)
                 ->acceptJson()
